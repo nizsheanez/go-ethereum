@@ -128,7 +128,6 @@ func (p *Peer) Deliver(ctx context.Context, chunk storage.Chunk, priority uint8)
 	ctx, sp = spancontext.StartSpan(
 		ctx,
 		"send.chunk.delivery")
-	sp.SetTag("hash", chunk.Address().String())
 	defer sp.Finish()
 
 	msg := &ChunkDeliveryMsg{
@@ -163,10 +162,6 @@ func (p *Peer) SendOfferedHashes(s *server, f, t uint64) error {
 	defer sp.Finish()
 
 	hashes, from, to, proof, err := s.SetNextBatch(f, t)
-	for i := 0; i < len(hashes); i += HashSize {
-		hash := hashes[i : i+HashSize]
-		sp.SetTag("hash", fmt.Sprintf("%064x", hash[:]))
-	}
 	if err != nil {
 		return err
 	}
